@@ -12,3 +12,7 @@ Here are some useful scripts for CNN implementation. These scripts are mainly ba
         
             python FLOPs_and_size.py
     - Note that we regard the vector multiplication as a floating-point operation. Some other people may think it is two independent operations, ie., multiplication and addition. Hence, their result may be as twice as large as ours. 
+
+## Acknowledge
+These scripts are collected from Internet. However, we cannot send our gratitude one by one. Here, we thank everyone who made contribution to this toolbox.
+
