@@ -1,13 +1,13 @@
 # CNN_Toolbox
 
 ## Introduction
-Here are some useful scripts for CNN implementation. 
-These scripts are mainly based on Caffe library.
+Here are some useful scripts for CNN implementation. These scripts are mainly based on Caffe library.
 
 ## Summary
 *Please specify the path of caffe in caffe_path.txt first!*
 
 - Model Complexity
+
 This script is for FLOPs (FLoating-point OPerations) & parameters calculation.
 You need add the *.prototxt file in this folder, and run:
         
