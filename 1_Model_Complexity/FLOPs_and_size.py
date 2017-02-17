@@ -58,7 +58,7 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
     if netspec is not None:
         os.remove(prototxt_file)
 
-    return total_params, total_flops
+    return total_params, 2 * total_flops
 
 
 if __name__ == '__main__':
