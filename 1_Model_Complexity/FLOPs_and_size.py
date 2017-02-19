@@ -1,6 +1,6 @@
 """
 Copyright 2016 Yahoo Inc.
-Licensed under the terms of the 2 clause BSD license. 
+Licensed under the terms of the 2 clause BSD license.
 Please see LICENSE file in the project root for terms.
 """
 import sys
@@ -36,7 +36,7 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
 
     net_params = caffe_pb2.NetParameter()
     text_format.Merge(open(prototxt_file).read(), net_params)
-
+    print '\n ########### output ###########'
     for layer in net_params.layer:
         if layer.name in net.params:
 
@@ -52,6 +52,10 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
             else:
                 flops = net.params[layer.name][0].data.size
 
+            print('%s: #params: %s, #FLOPs: %s') % (
+                layer.name,
+                digit2string(params),
+                digit2string(flops))
             total_params += params
             total_flops += flops
 
@@ -61,13 +65,24 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
     return total_params, 2 * total_flops
 
 
+def digit2string(x):
+    x = float(x)
+    if x < 10 ** 3:
+        return "%.2f" % float(x)
+    elif x < 10 ** 6:
+        x = x / 10 ** 3
+        return "%.2f" % float(x) + 'K'
+    elif x < 10 ** 9:
+        x = x / 10 ** 6
+        return "%.2f" % float(x) + 'M'
+    else:
+        x = x / 10 ** 9
+        return "%.2f" % float(x) + 'B'
+
+
 if __name__ == '__main__':
     filepath = 'deploy.prototxt'
     params, flops = get_complexity(prototxt_file=filepath, mode='Test')
     print '\n ########### result ###########'
-    if float(flops) / 10**6 > 10**3:
-        print '#params=%.2fM, #FLOPs=%.2fB' % (float(params) / 10**6,
-                                               float(flops) / 10**9)
-    else:
-        print '#params=%.2fM, #FLOPs=%.2fM' % (float(params) / 10**6,
-                                               float(flops) / 10**6)
+    print '#params=%s, #FLOPs=%s' % (digit2string(params),
+                                     digit2string(flops))
