@@ -4,15 +4,19 @@ Licensed under the terms of the 2 clause BSD license.
 Please see LICENSE file in the project root for terms.
 """
 import sys
-fid = open('../caffe_path.txt', 'r')
-caffe_root = fid.readline().strip('\n')
-fid.close()
+import os
+if os.path.isfile('../caffe_path.txt'):
+    fid = open('../caffe_path.txt', 'r')
+    caffe_root = fid.readline().strip('\n')
+    fid.close()
+else:
+    caffe_root = '/home/luojh2/Software/caffe-master/python/'
 sys.path.insert(0, caffe_root)
 import caffe
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 import tempfile
-import os
+
 caffe.set_mode_cpu()
 
 
@@ -81,7 +85,11 @@ def digit2string(x):
 
 
 if __name__ == '__main__':
-    filepath = 'deploy.prototxt'
+    length = len(sys.argv)
+    if length == 1:
+        filepath = 'deploy.prototxt'
+    else:
+        filepath = sys.argv[1]
     params, flops = get_complexity(prototxt_file=filepath, mode='Test')
     print '\n ########### result ###########'
     print '#params=%s, #FLOPs=%s' % (digit2string(params),
