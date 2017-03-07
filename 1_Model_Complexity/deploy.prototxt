@@ -1,8 +1,46 @@
-input: "data"
-input_dim: 1
-input_dim: 3
-input_dim: 224
-input_dim: 224
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mirror: true
+    crop_size: 224
+    mean_value: 110
+    mean_value: 127
+    mean_value: 123
+  }
+  data_param {
+    source: "/opt/luojh/Dataset/CUB/LMDB/cub200_2011_train_lmdb"
+    batch_size: 32
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    crop_size: 224
+    mean_value: 110
+    mean_value: 127
+    mean_value: 123
+  }
+  data_param {
+    source: "/opt/luojh/Dataset/CUB/LMDB/cub200_2011_val_lmdb"
+    batch_size: 2
+    backend: LMDB
+  }
+}
 layer {
   name: "conv1_1"
   type: "Convolution"
@@ -17,7 +55,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 64
+    num_output: 32
     pad: 1
     kernel_size: 3
   }
@@ -42,7 +80,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 64
+    num_output: 32
     pad: 1
     kernel_size: 3
   }
@@ -78,7 +116,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     pad: 1
     kernel_size: 3
   }
@@ -103,7 +141,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     pad: 1
     kernel_size: 3
   }
@@ -139,7 +177,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 128
     pad: 1
     kernel_size: 3
   }
@@ -164,7 +202,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 128
     pad: 1
     kernel_size: 3
   }
@@ -189,7 +227,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 128
     pad: 1
     kernel_size: 3
   }
@@ -225,7 +263,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     pad: 1
     kernel_size: 3
   }
@@ -250,7 +288,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     pad: 1
     kernel_size: 3
   }
@@ -275,7 +313,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 512
+    num_output: 256
     pad: 1
     kernel_size: 3
   }
@@ -378,16 +416,16 @@ layer {
   bottom: "relu5_3"
   top: "pool5"
   pooling_param {
-    pool: MAX
-    kernel_size: 2
-    stride: 2
+    pool: AVE
+    kernel_size: 14
+    stride: 1
   }
 }
 layer {
-  name: "fc6"
-  type: "InnerProduct"
+  name: "softmax"
+  type: "Convolution"
   bottom: "pool5"
-  top: "fc6"
+  top: "softmax"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -396,77 +434,25 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  inner_product_param {
-    num_output: 4096
+  convolution_param {
+    num_output: 200
+    kernel_size: 1
   }
 }
 layer {
-  name: "relu6"
-  type: "ReLU"
-  bottom: "fc6"
-  top: "relu6"
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "softmax"
+  bottom: "label"
+  top: "loss"
 }
 layer {
-  name: "drop6"
-  type: "Dropout"
-  bottom: "relu6"
-  top: "relu6"
-  dropout_param {
-    dropout_ratio: 0.5
+  name: "acc_top_1"
+  type: "Accuracy"
+  bottom: "softmax"
+  bottom: "label"
+  top: "acc_top_1"
+  accuracy_param {
+    top_k: 1
   }
-}
-layer {
-  name: "fc7"
-  type: "InnerProduct"
-  bottom: "relu6"
-  top: "fc7"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 4096
-  }
-}
-layer {
-  name: "relu7"
-  type: "ReLU"
-  bottom: "fc7"
-  top: "relu7"
-}
-layer {
-  name: "drop7"
-  type: "Dropout"
-  bottom: "relu7"
-  top: "relu7"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  name: "fc8"
-  type: "InnerProduct"
-  bottom: "relu7"
-  top: "fc8"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 1000
-  }
-}
-layer {
-  name: "prob"
-  type: "Softmax"
-  bottom: "fc8"
-  top: "prob"
 }
