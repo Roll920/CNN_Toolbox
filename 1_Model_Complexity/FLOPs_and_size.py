@@ -55,7 +55,7 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
                 # print >> sys.stderr, layer.name, params, flops
             else:
                 flops = net.params[layer.name][0].data.size
-
+            flops *= 2 
             print('%s: #params: %s, #FLOPs: %s') % (
                 layer.name,
                 digit2string(params),
@@ -66,7 +66,7 @@ def get_complexity(netspec=None, prototxt_file=None, mode=None):
     if netspec is not None:
         os.remove(prototxt_file)
 
-    return total_params, 2 * total_flops
+    return total_params, total_flops
 
 
 def digit2string(x):
